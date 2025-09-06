@@ -1,0 +1,61 @@
+﻿@page "/jugadores/create"
+@inject JugadoresServices JugadoresService
+@inject NavigationManager NavigationManager
+
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h3><strong>Registro de Jugador</strong></h3>
+    </div>
+    <div class="card-body">
+        <EditForm Model="jugador" OnValidSubmit="Guardar" formname="crear-jugador">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label for="Nombre" class="form-label">Nombre:</label>
+                <InputText id="Nombre" class="form-control" @bind-Value="jugador.Nombre" />
+                <ValidationMessage For="@(() => jugador.Nombre)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Partidas" class="form-label">Partidas Jugadas:</label>
+                <InputNumber id="Partidas" class="form-control" @bind-Value="jugador.Partidas" />
+                <ValidationMessage For="@(() => jugador.Partidas)" />
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                <div class="alert alert-danger">@mensajeError</div>
+            }
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success"><i class="bi bi-floppy-fill"></i> Guardar</button>
+                <button type="button" class="btn btn-primary" @onclick="Nuevo"><i class="bi bi-file-earmark-plus-fill"></i> Nuevo</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Jugadores jugador = new Jugadores();
+    private string? mensajeError;
+
+    private async Task Guardar()
+    {
+        mensajeError = null;
+        var guardado = await JugadoresService.Guardar(jugador);
+        if (guardado != null)
+        {
+            Nuevo();
+        }
+        else
+        {
+            mensajeError = "Error: Ya existe un jugador con este nombre.";
+        }
+    }
+
+    private void Nuevo()
+    {
+        jugador = new Jugadores();
+        mensajeError = null;
+    }
+}

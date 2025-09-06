@@ -1,0 +1,70 @@
+﻿@page "/jugadores/edit/{JugadorId:int}"
+@inject JugadoresServices JugadoresService
+@inject NavigationManager NavigationManager
+
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h3><strong>Editar Jugador</strong></h3>
+    </div>
+    <div class="card-body">
+        <EditForm Model="jugador" OnValidSubmit="Guardar" formname="editar-jugador">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label for="Nombre" class="form-label">Nombre:</label>
+                <InputText id="Nombre" class="form-control" @bind-Value="jugador.Nombre" />
+                <ValidationMessage For="@(() => jugador.Nombre)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Partidas" class="form-label">Partidas Jugadas:</label>
+                <InputNumber id="Partidas" class="form-control" @bind-Value="jugador.Partidas" />
+                <ValidationMessage For="@(() => jugador.Partidas)" />
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                <div class="alert alert-danger">@mensajeError</div>
+            }
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success"><i class="bi bi-floppy-fill"></i> Guardar</button>
+                <a href="/jugadores" class="btn btn-secondary">Volver</a>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int JugadorId { get; set; }
+
+    private Jugadores jugador = new Jugadores();
+    private string? mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (JugadorId > 0)
+        {
+            var encontrado = await JugadoresService.Buscar(JugadorId);
+            if (encontrado != null)
+            {
+                jugador = encontrado;
+            }
+        }
+    }
+
+    private async Task Guardar()
+    {
+        mensajeError = null;
+        var guardado = await JugadoresService.Guardar(jugador);
+        if (guardado != null)
+        {
+            NavigationManager.NavigateTo("/jugadores");
+        }
+        else
+        {
+            mensajeError = "Error: No se pudo guardar el jugador.";
+        }
+    }
+}

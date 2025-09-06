@@ -1,0 +1,92 @@
+﻿
+@page "/jugadores"
+@inject JugadoresServices JugadoresService
+@inject NavigationManager NavigationManager
+
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h3><strong>Consulta de Jugadores</strong></h3>
+    </div>
+
+    <div class="card-body">
+        <div class="input-group mb-3">
+            <input @bind="busquedaNombre" type="text" class="form-control" placeholder="Buscar por nombre..." @onkeydown="BuscarConEnter" />
+            <button @onclick="BuscarJugadores" class="btn btn-outline-primary" type="button"><i class="bi bi-search"></i> Buscar</button>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>JugadorId</th>
+                    <th>Nombre</th>
+                    <th>Partidas Jugadas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (jugadores.Any())
+                {
+                    @foreach (var jugador in jugadores)
+                    {
+                        <tr>
+                            <td>@jugador.JugadorId</td>
+                            <td>@jugador.Nombre</td>
+                            <td>@jugador.Partidas</td>
+                            <td>
+                                <a href="/jugadores/edit/@jugador.JugadorId" class="btn btn-warning"><i class="bi bi-pencil-fill"></i> Editar</a>
+                                <a href="/jugadores/delete/@jugador.JugadorId" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Eliminar</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center">No se encontraron jugadores.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer">
+        <a href="/jugadores/create" class="btn btn-primary"><i class="bi bi-plus-circle-fill"></i> Nuevo Jugador</a>
+    </div>
+</div>
+
+@code {
+    private List<Jugadores> jugadores = new();
+    private string busquedaNombre = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarJugadores();
+    }
+
+    private async Task CargarJugadores()
+    {
+        if (string.IsNullOrWhiteSpace(busquedaNombre))
+        {
+            jugadores = await JugadoresService.ListarTodos();
+        }
+        else
+        {
+            
+            jugadores = await JugadoresService.Listar(j =>
+                j.Nombre != null && j.Nombre.ToLower().Contains(busquedaNombre.ToLower())
+            );
+        }
+    }
+
+    private async Task BuscarJugadores()
+    {
+        await CargarJugadores();
+    }
+
+    
+    private async Task BuscarConEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await CargarJugadores();
+        }
+    }
+}
