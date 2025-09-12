@@ -3,39 +3,35 @@ using Registro_de_Jugadores.DAL;
 using Registro_de_Jugadores.Models;
 using System.Linq.Expressions;
 
-namespace Registro_de_Jugadores.Services
-{
-    public class JugadoresServices
+namespace Registro_de_Jugadores.Services;
+
+    public class JugadoresServices(IDbContextFactory<Contexto> DbFactory)
     {
-        private readonly IDbContextFactory<Contexto> _contextFactory;
-
-        public JugadoresServices(IDbContextFactory<Contexto> contextFactory)
+        
+        private async Task<bool> Existe(int jugadorId)
         {
-            _contextFactory = contextFactory;
+           await using var context = await DbFactory.CreateDbContextAsync();
+            return await context.Jugadores
+                .AnyAsync(j => j.JugadorId == jugadorId);
         }
 
-        public async Task<bool> Existe(int jugadorId)
-        {
-            using var context = _contextFactory.CreateDbContext();
-            return await context.Jugadores.AnyAsync(j => j.JugadorId == jugadorId);
-        }
-
-        // --- CAMBIO EN ESTE MÉTODO ---
+        
         private async Task<bool> NombreExiste(string nombre)
         {
-            using var context = _contextFactory.CreateDbContext();
-            // Se usa "Nombre" en lugar de "Nombres"
-            return await context.Jugadores.AnyAsync(j => j.Nombre != null && j.Nombre.ToLower() == nombre.ToLower());
+             await using var context = await DbFactory.CreateDbContextAsync();
+            
+            return await context.Jugadores
+                .AnyAsync(j => j.Nombre != null && j.Nombre.ToLower() == nombre.ToLower());
         }
 
-        public async Task<Jugadores?> Guardar(Jugadores jugador)
+        public async Task<bool> Guardar(Jugadores jugador)
         {
             if (jugador.JugadorId == 0)
             {
-                // Se usa "Nombre" en lugar de "Nombres"
+                
                 if (await NombreExiste(jugador.Nombre!))
                 {
-                    return null;
+                   
                 }
                 return await Insertar(jugador);
             }
@@ -43,56 +39,55 @@ namespace Registro_de_Jugadores.Services
             {
                 if (!await Existe(jugador.JugadorId))
                 {
-                    return null;
+                    
                 }
                 return await Modificar(jugador);
             }
         }
 
-        private async Task<Jugadores?> Insertar(Jugadores jugador)
+        private async Task<bool> Insertar(Jugadores jugador)
         {
-            using var context = _contextFactory.CreateDbContext();
-            context.Jugadores.Add(jugador);
-            await context.SaveChangesAsync();
-            return jugador;
+            await using var context = await DbFactory.CreateDbContextAsync();
+            context.Update(jugador);
+            return await context.SaveChangesAsync() >0;
+            
         }
 
-        private async Task<Jugadores?> Modificar(Jugadores jugador)
+        private async Task<bool> Modificar(Jugadores jugador)
         {
-            using var context = _contextFactory.CreateDbContext();
-            context.Entry(jugador).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-            return jugador;
+           await using var context = await DbFactory.CreateDbContextAsync();
+            context.Update(jugador);
+            return  await context.SaveChangesAsync() >0;
+            
         }
 
         public async Task<bool> Eliminar(int jugadorId)
         {
-            using var context = _contextFactory.CreateDbContext();
-            var jugador = await context.Jugadores.FindAsync(jugadorId);
-            if (jugador == null)
-            {
-                return false;
-            }
-            context.Jugadores.Remove(jugador);
-            return await context.SaveChangesAsync() > 0;
+            await using var context = await DbFactory.CreateDbContextAsync();
+            return await context.Jugadores.Where
+                (j => j.JugadorId == jugadorId)
+                .ExecuteDeleteAsync() > 0;
         }
 
         public async Task<Jugadores?> Buscar(int jugadorId)
         {
-            using var context = _contextFactory.CreateDbContext();
-            return await context.Jugadores.FindAsync(jugadorId);
+            await using var context = await DbFactory.CreateDbContextAsync();
+            return await context.Jugadores.Include(n => n.Nombre)
+                .FirstOrDefaultAsync(j => j.JugadorId == jugadorId);
         }
 
         public async Task<List<Jugadores>> Listar(Expression<Func<Jugadores, bool>> criterio)
         {
-            using var context = _contextFactory.CreateDbContext();
-            return await context.Jugadores.AsNoTracking().Where(criterio).ToListAsync();
+           await using var context =await  DbFactory.CreateDbContextAsync();
+            return await context.Jugadores
+                .Where(criterio)
+                .AsNoTracking()
+                .ToListAsync(); 
         }
 
         public async Task<List<Jugadores>> ListarTodos()
         {
-            using var context = _contextFactory.CreateDbContext();
+            using var context = DbFactory.CreateDbContext();
             return await context.Jugadores.AsNoTracking().ToListAsync();
         }
     }
-}

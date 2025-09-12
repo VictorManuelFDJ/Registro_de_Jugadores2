@@ -1,92 +1,118 @@
 ﻿
 @page "/jugadores"
-@inject JugadoresServices JugadoresService
-@inject NavigationManager NavigationManager
+@inject JugadoresServices jugadoresService
+@inject NavigationManager navigationManager
 
-<div class="card shadow-lg">
-    <div class="card-header">
-        <h3><strong>Consulta de Jugadores</strong></h3>
-    </div>
+<PageTitle>Registro de Jugadores</PageTitle>
+<div class="container">
+     <div class="card-shadow-lg">
+          <div class="card-header space-between">
+               <h5 class="card-title">Registro de Jugadores</h5>
+               <a href="/jugadores/create" class="btn btn-primary"><span class="bi bi-plus-square mt-3"></span>Crear</a>
+            </div>
 
-    <div class="card-body">
-        <div class="input-group mb-3">
-            <input @bind="busquedaNombre" type="text" class="form-control" placeholder="Buscar por nombre..." @onkeydown="BuscarConEnter" />
-            <button @onclick="BuscarJugadores" class="btn btn-outline-primary" type="button"><i class="bi bi-search"></i> Buscar</button>
-        </div>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>JugadorId</th>
-                    <th>Nombre</th>
-                    <th>Partidas Jugadas</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (jugadores.Any())
-                {
-                    @foreach (var jugador in jugadores)
-                    {
+            <div class="card-body">
+
+                @*labels*@
+                <div class="row">
+
+                    @*Filtrar por*@
+                    <div class="col-3">
+                        <label class="col-form-label"><strong>Filtrar por</strong></label>
+                    </div>
+
+                    @*ValorFiltro*@
+                    <div class="col-4">
+                        <label class="col-form-label"><strong>B&uacute;squeda</strong></label>
+                    </div>
+                </div>
+
+                @*Input y botones*@
+                <div class="row aling-items-center">
+                    @*filtro*@
+                    <div class="col-3">
+                        <InputSelect class="form-select" @bind-Value="Filtro">
+                            <option value="" selected disabled>Elija una opci&oacute;n</option>
+                            <option value="Nombre">Nombre</option>
+                            <option value="Partidas">Partidas</option>
+                        </InputSelect>
+                    </div>
+
+                    @*Busqueda*@
+                    <div class="col-4">
+                        <div class="input-group">
+                            <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                            <button type="button" class="btn btn-outline-primary bi bi-search"@onclick="Buscar"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover">
+                    <thead class="table table-striped text-black">
                         <tr>
-                            <td>@jugador.JugadorId</td>
-                            <td>@jugador.Nombre</td>
-                            <td>@jugador.Partidas</td>
-                            <td>
-                                <a href="/jugadores/edit/@jugador.JugadorId" class="btn btn-warning"><i class="bi bi-pencil-fill"></i> Editar</a>
-                                <a href="/jugadores/delete/@jugador.JugadorId" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Eliminar</a>
-                            </td>
+                            <th>JugadorId</th
+                            <th>Nombre</th>
+                            <th>Partidas</th>
+                            <th>Opciones</th>
                         </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="4" class="text-center">No se encontraron jugadores.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    <div class="card-footer">
-        <a href="/jugadores/create" class="btn btn-primary"><i class="bi bi-plus-circle-fill"></i> Nuevo Jugador</a>
-    </div>
-</div>
+                    </thead>
+                    <tbody>
+                        @foreach(var jugador in ListaJugadores)
+                        {
+                            <tr>
+                                <td>@jugador.JugadorId</td>
+                                <td>@jugador.Nombre</td>
+                                <td>@jugador.Partidas</td>
 
+                                <td class="text-center">
+                                    <a href="//jugadores/edit/@jugador.JugadorId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer space-between">
+                <label>Cantidad: @ListaJugadores.Count()</label>
+                <label>Total: @ListaJugadores.Sum(x => x.Partidas)</label>
+            </div>
+        </div>
+    </div>
+           
 @code {
-    private List<Jugadores> jugadores = new();
-    private string busquedaNombre = string.Empty;
+    public List<Jugadores> ListaJugadores {get; set;} = new List<Jugadores>();
+
+    public string Filtro {get; set;} = string.Empty;
+    public string ValorFiltro {get; set;} = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarJugadores();
+        ListaJugadores =await jugadoresService.Listar(j => j.JugadorId > 0);
     }
 
-    private async Task CargarJugadores()
+    private async Task Buscar()
     {
-        if (string.IsNullOrWhiteSpace(busquedaNombre))
+        if(ValorFiltro.Trim() != "")
         {
-            jugadores = await JugadoresService.ListarTodos();
+            if(Filtro == "Nombre")
+            {
+                ListaJugadores = await jugadoresService.Listar(j => j.Nombre != null && j.Nombre.ToLower().Contains(ValorFiltro.ToLower()));
+            }
+            else if(Filtro == "Partidas")
+            {
+                // Convert Partidas (int) to string before calling ToLower and Contains
+                ListaJugadores = await jugadoresService.Listar(j => j.Partidas.ToString().ToLower().Contains(ValorFiltro.ToLower()));
+            }
         }
         else
         {
-            
-            jugadores = await JugadoresService.Listar(j =>
-                j.Nombre != null && j.Nombre.ToLower().Contains(busquedaNombre.ToLower())
-            );
+            ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
         }
     }
-
-    private async Task BuscarJugadores()
+    private async Task Restablecer()
     {
-        await CargarJugadores();
-    }
-
-    
-    private async Task BuscarConEnter(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            await CargarJugadores();
-        }
+        ListaJugadores = await jugadoresService.Listar(e => e.JugadorId > 0);
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
     }
 }

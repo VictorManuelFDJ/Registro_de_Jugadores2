@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(options =>
-    options.UseSqlServer(ConStr));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConStr")));
 
 
 
