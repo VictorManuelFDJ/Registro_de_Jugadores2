@@ -1,85 +1,98 @@
-﻿@page "/jugadores/edit/{JugadorId:int}"
+﻿@page "/jugadores/Edit/{JugadorId:int}"
+
 @inject JugadoresServices jugadoresService
 @inject NavigationManager navigationManager
-@inject IToastService toastService
 @rendermode InteractiveServer
 
-@*HTML*@
-<PageTitle>Modificar</PageTitle>
-<EditForm Model="jugador" OnValidSubmit="Modificar">
-        <DataAnnotationsValidator />
-        <ValidationSummery />
+<PageTitle>Editar Jugador</PageTitle>
+<EditForm Model="jugador" OnValidSubmit="Modificar" FormName="Jugadores">
+    <DataAnnotationsValidator />
+    <ValidationSummary/>
 
-        <div class="container">
-            <div class="card shadow-lg">
-                <div class="card-header text-center">
-                    <h5 class="card-title">Modificar Jugador</h5>
-                </div>
-
-                <div class="card_body">
-                    @*Nombre*@
-                    <div class= "mb-3">
-                         <label class="form-label"><strong>Nombre</strong></label>
-                         <InputText class="form-control" @bind-Value="jugador.Nombre"></InputText>
-                         <ValidationMessage For="@(() => jugador.Nombre)" />
-                    </div>
-                    @*Partidas*@
-                    <div class="mb-3">
-                        <label class="form-label"><strong>Partidas</strong></label>
-                        <InputNumber class="form-control" @bind-Value="jugador.Partidas"></InputNumber>
-                        <ValidationMessage For="@(() => jugador.Partidas)" />
-                    </div>
-                </div>
-
-                @*footer*@
-                <div class="card-footer text-canter mt-2">
-                    <a href="/jugadores" class="btn btn-secondary">
-                        <span class="bi bi-arrow-left"></span> Volver
-                    </a> 
-                    <button type="submit" class="btn btn-floppy" @onclick="Modificar"> Modificar</button>
-                    <button type="button" class="btn btn-danger bi bi-trash" @onclick="Eliminar"> Eliminar</button>
-                </div>
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class=" card-header text-center">
+                <h5 class="card-title">Modificar Jugador</h5>
             </div>
         </div>
+
+        <div class="card-body">
+
+            @*Nombre*@
+            <div class="mb-3">
+                <label class="col-form-label"><strong>Nombres</strong></label>
+                <InputText class="form-control" @bind-Value="jugador.Nombre"></InputText>
+                <label class="form-label"><strong>@Mensaje</strong></label>
+                <ValidationMessage For="(() => jugador.Nombre)" />
+            </div>
+
+            @*Partida*@
+            <div class="mb-3">
+                <label class="form-label"><strong>Partidas</strong></label>
+                <InputNumber class="form-control" @bind-Value="jugador.Partidas"></InputNumber>
+                <ValidationMessage For="(() => jugador.Partidas)" />
+            </div>
+        </div>
+
+            @*footer*@
+            <div class="card-footer text-center mt-2">
+            <a href="/jugadores" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy" @onclick="Modificar"> Modificar</button>
+                <button type="button" class="btn btn-danger bi bi-trash" @onclick="Eliminar"> Eliminar</button>
+            </div>
+    </div>
+
 </EditForm>
 @code {
     [Parameter]
-    public int JugadorId {get; set; }
-
-    public Jugadores jugador {get; set; } = new Jugadores();
-    public string Mensaje {get; set; } = string.Empty;
-    public List<Jugadores> ListaNombres {get; set; } = new List<Jugadores>();
-
+    public int JugadorId { get; set; }
+    public Jugadores jugador { get; set; } = new Jugadores();
+    public string Mensaje { get; set; } = string.Empty;
+    public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
     protected override async Task OnInitializedAsync()
     {
-      jugador = await jugadoresService.Buscar(JugadorId);
-      ListaNombres = await jugadoresService.Listar(j => j.JugadorId > 0);
+        jugador = await jugadoresService.Buscar(JugadorId);
+        ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
     }
-
     public async Task Modificar()
     {
-        var creado = await jugadoresService.Guardar(jugador);
-        if(creado)
+        var existe = await jugadoresService.Existe(jugador.Nombre);
+
+        if (existe)
         {
-            toastService.ShowSuccess("Se ha modificado correctamente");
+            Mensaje = "Ya existe un jugador con ese nombre";
+            return;
+        }
+
+        var modificado = await jugadoresService.Guardar(jugador);
+        if (modificado)
+        {
+            navigationManager.NavigateTo("/jugadores");
         }
         else
         {
-            toastService.ShowError("No se ha podido modificar correctamente");
+            Mensaje = "No se pudo modificar el jugador";
         }
     }
 
-    private async Task Eliminar(){
-        var eliminado = await jugadoresService.Eliminar(jugador.JugadorId);
-
-        if(eliminado)
+    private async Task Eliminar()
+    {
+        var eliminado = await jugadoresService.Eliminar(JugadorId);
+        if (eliminado)
         {
-            toastService.ShowSuccess("Se ha eliminado corretamente");
             navigationManager.NavigateTo("/jugadores");
-        }else
+        }
+        else
         {
-            toastService.ShowError("No se ha podido eliminar correctamente");
+            Mensaje = "No se pudo eliminar el jugador";
         }
     }
-    
+
+    private async Task Volver()
+    {
+            navigationManager.NavigateTo("/jugadores");
+    }
+
 }

@@ -1,74 +1,76 @@
-﻿@page "/jugadores/create"
+﻿@page "/jugadores/Create"
+
 @inject JugadoresServices jugadoresService
 @inject NavigationManager navigationManager
-@inject IToastService toastService
 @rendermode InteractiveServer
 
-
-@*HTML*@
 <PageTitle>Create</PageTitle>
-<EditForm Model="jugador" OnValidSubmit="Guardar" OnInvalidSubmit="Errores" FormName="CrearJugador">
-        <DataAnnotationsValidator />
+<EditForm Model="jugador" OnValidSubmit="Guardar" FormName="Jugadores">
+    <DataAnnotationsValidator />
 
-        <div class="container">
-            <div class="card shadow-lg">
-                <div class="card-body">
-
-                    @*Nombre*@
-                    <div class= "mb-3">
-                        <label class="form-label"><strong>Nombre</strong></label>
-                        <InputText class="form-control form-select" @bind-Value=jugador.Nombre></InputText>
-                        <ValidationMessage For="@(() => jugador.Nombre)" />
-                    </div>
-                    @*Partidas*@
-                    <div class="mb-3">
-                        <label class="form-label"><strong>Partidas</strong></label>
-                        <InputNumber class="form-control" @bind-Value="jugador.Partidas"></InputNumber>
-                        <ValidationMessage For="@(() => jugador.Partidas)" />
-                    </div>
-                </div>
-
-                @*footer*@
-                <div class="card-footer text-center mt-2">
-                    <a href="/jugadores" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
-                    <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
-                </div>
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class=" card-header text-center">
+                <h5 class="card-title">Crear Jugador</h5>
             </div>
         </div>
-</EditForm>
-@Mensaje             
 
+        <div class="card-body">
+
+            @*Nombre*@
+            <div class="mb-3">
+                <label class="col-form-label"><strong>Nombres</strong></label>
+                <InputText class="form-control" @bind-Value="jugador.Nombre"></InputText>
+                <label class="form-label"><strong>@Mensaje</strong></label>
+                <ValidationMessage For="(() => jugador.Nombre)" />
+            </div>
+
+            @*Partida*@
+            <div class="mb-3">
+                <label class="form-label"><strong>Partidas</strong></label>
+                <InputNumber class="form-control" @bind-Value="jugador.Partidas"></InputNumber>
+                <ValidationMessage For="(() => jugador.Partidas)" />
+            </div>
+        </div>
+
+        @*footer*@
+        <div class="card-footer text-center mt-2">
+            <a href="/jugadores/index" class="btn btn-secondary"><span class="bi bi-arrow-left"></span>Volver</a>
+            <button type="submit" class="btn btn-primary bi bi-floppy"><span class="bi bi-save>"></span>Guardar</button>
+        </div>
+
+
+    </div>
+
+</EditForm>
 
 
 @code {
-    public Jugadores jugador {get; set; } = new Jugadores();
-    public string Mensaje {get; set; } = string.Empty;
-    public List<Jugadores> ListaNombres {get; set; } = new List<Jugadores>();
+    public Jugadores jugador { get; set; } = new Jugadores();
+    public string Mensaje { get; set; } = string.Empty;
+    public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
 
     protected override async Task OnInitializedAsync()
     {
-        ListaNombres = await jugadoresService.Listar(j => j.JugadorId > 0);
+        ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
     }
 
     public async Task Guardar()
     {
+        var existe = await jugadoresService.Existe(jugador.Nombre);
+
+        if (existe)
+        {
+            Mensaje = "Ya existe un jugador con ese nombre";
+            return;
+        }
+
         var creado = await jugadoresService.Guardar(jugador);
 
         if(creado)
         {
-            toastService.ShowSuccess("Jugador Guardado Correctamente");
             navigationManager.NavigateTo("/jugadores");
-        }else
-        {
-            toastService.ShowError("Error al Guardar el Jugador");
         }
-    }
-    private void Errores(EditContext editContext)
-    {
-        Console.WriteLine("Errores de validación:");
-        foreach (var e in editContext.GetValidationMessages())
-        {
-            Console.WriteLine(e);
-        }
+
     }
 }
