@@ -11,14 +11,13 @@ var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConStr")));
 
-
+//Esta linea es para poder cerrar el issue
 
 builder.Services.AddScoped<JugadoresServices>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
 builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
