@@ -1,3 +1,4 @@
+using Blazored.Toast;
 using Microsoft.EntityFrameworkCore;
 using Registro_de_Jugadores.Components;
 using Registro_de_Jugadores.DAL;
@@ -17,6 +18,8 @@ builder.Services.AddScoped<JugadoresServices>();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
 
