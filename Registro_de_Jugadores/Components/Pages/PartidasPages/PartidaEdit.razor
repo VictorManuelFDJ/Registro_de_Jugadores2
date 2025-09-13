@@ -1,4 +1,136 @@
 ﻿@page "/Partidas/Edit/{PartidaId:int}"
+
+@inject PartidasService partidaService
+@inject JugadoresServices jugadoresService
+@inject NavigationManager navigationMannager
+@rendermode InteractiveServer
+
+<PageTitle>Editar Partidas</PageTitle>
+<EditForm Model="partidas" OnValidSubmit="Modificar" FormName="Partidas">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<div class="container">
+		<div class="card shadow-lg">
+			<div class="card-header text-center">
+			    <h5 class="card-title">Modificar Partida</h5>
+			</div>
+		</div> @* Etiqueta de cierre faltante *@
+
+		<div class ="card-body">
+
+			@*Jugador 1*@
+			<div class="mb-3">
+				<label class="col-form-label"><strong>Jugador1</strong></label>
+				<InputSelect @bind-Value="partidas.Jugador1Id" class ="form-select">
+					<option value="0"> Seleccione un Jugador</option>
+					@foreach(var jugador in jugadores)
+					{
+						<option value="@jugador.JugadorId">@jugador.Nombre</option>
+					}
+				</InputSelect>
+				<ValidationMessage For="(() => partidas.Jugador1Id)" />
+			</div>
+
+			@*Jugador 2*@
+			<div class="mb-3">
+				<label class="col-form-label"><strong>Jugador2</strong></label>
+				<InputSelect @bind-Value="partidas.Jugador2Id" class="form-select">
+					<option value="">Seleccione un Jugador</option>
+					@foreach( var jugador in jugadores)
+					{
+						<option value="@jugador.JugadorId">@jugador.Nombre</option>
+					}
+				</InputSelect>
+			</div>
+
+			@*Estado de la Partida*@
+			<div class="mb-3">
+				<label class="col-form-label"><strong>Estado de la Partida</strong></label>
+				<InputText class="form-control" @bind-Value="partidas.EstadoPartida" />
+				<ValidationMessage For="(() => partidas.EstadoPartida)" />
+			</div>
+
+			@*Ganador*@
+			<div class="mb-3">
+				<label class="col-form-label"><strong>Ganador</strong></label>
+				<InputSelect @bind-Value="partidas.GanadorId" class="form-select">
+					<option value="">Seleccione un Ganador</option>
+					@foreach(var jugador in jugadores)
+					{
+						<option value="@jugador.JugadorId">@jugador.Nombre</option>
+					}
+				</InputSelect>
+			</div>
+
+			@*Turno del Jugador*@
+			<div class="mb-3">
+				<label class="col-form-label"><strong>Turno del Jugador</strong></label>
+				<InputSelect @bind-Value="partidas.TurnoJugadorId" class="form-select">
+					<option value="0">Seleccione el Turno</option>
+					@foreach(var jugador in jugadores)
+					{
+						<option value="@jugador.JugadorId">@jugador.Nombre</option>
+					}
+				</InputSelect>
+				<ValidationMessage For="(() => partidas.TurnoJugadorId)" />
+			</div>
+
+			@*Estado del tablero*@
+			<div class="mb-3">
+				<label class="col-form-label"><strong>Estado del Tablero</strong></label>
+				<InputText class="form-control" @bind-Value="partidas.EstadoTablero" />
+				<ValidationMessage For="(() => partidas.EstadoTablero)" />
+			</div>
+
+			@*Fechas de Fin*@
+			<div class="mb-3">
+				<label class="col-form-label"><strong>Fecha de fin</strong></label>
+				<InputDate class="form-control" @bind-Value="partidas.FechaFin" />
+			</div>
+		</div>
+
+		<div class="card-footer text-center mt-2">
+			<a href="/Partidas" class="btn btn-secondary"><span class="bi bi-arrow-left"></span>Volver</a>
+			<button type="submit" class="btn btn-primary bi bi-floppy"> Modificar</button>
+			<button type="button" class ="btn btn-danger bi bi-trash" @onclick="Eliminar"> Eliminar</button>
+		</div>
+	</div>
+
+</EditForm>
+
 @code {
+	[Parameter]
+	public int PartidaId {get; set;}
+	private Partidas partidas = new Partidas();
+	private List<Jugadores> jugadores = new List<Jugadores>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		jugadores = await jugadoresService.Listar(j => true);
+		partidas = await partidaService.Buscar(PartidaId);
+		if(partidas == null)
+		{
+			navigationMannager.NavigateTo("/Partidas");
+		}
+	}
+
+	private async Task Modificar()
+	{
+		var modificado = await partidaService.Guardar(partidas);
+		if(modificado)
+		{
+			navigationMannager.NavigateTo("/Partidas");
+		}
+	}
+	
+	private async Task Eliminar()
+	{
+		var eliminado = await partidaService.Eliminar(PartidaId);
+		if(eliminado)
+		{
+			navigationMannager.NavigateTo("/Partidas");
+		}
+	}
 
 }

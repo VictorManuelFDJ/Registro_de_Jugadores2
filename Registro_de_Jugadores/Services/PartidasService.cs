@@ -38,6 +38,14 @@ public class PartidasService(IDbContextFactory<Contexto> DbFactory)
             .Where(p => p.PartidaId == PartidaId)
             .ExecuteDeleteAsync() > 0;
     }
+    public async Task<bool> Eliminar(int PartidaId)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Partidas.
+            AsNoTracking()
+            .Where(p => p.PartidaId == PartidaId)
+            .ExecuteDeleteAsync() > 0;
+    }
     public async Task<Partidas> Buscar(int partidasId) 
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
