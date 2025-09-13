@@ -11,9 +11,10 @@ var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConStr")));
 
-//Esta linea es para poder cerrar el issue
+
 
 builder.Services.AddScoped<JugadoresServices>();
+builder.Services.AddScoped<PartidasService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

@@ -18,7 +18,6 @@ public class JugadoresServices(IDbContextFactory<Contexto> DbFactory)
             return await Modificar(jugador);
         }
     }
-
     public async Task<bool> Insertar(Jugadores jugador)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();

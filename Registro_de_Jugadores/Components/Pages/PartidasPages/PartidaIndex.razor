@@ -1,0 +1,138 @@
+﻿@page "/Partidas"
+
+@inject PartidasService partidaService
+@inject NavigationManager navigationMannager
+@rendermode InteractiveServer
+
+<PageTitle>Partidas Jugadores</PageTitle>
+<div class="container">
+	<div class="card shadow-lg">
+		<div class="card-header space-between">
+			<h5 class="card-title">Partidas Jugadores</h5>
+			<a href="/Partidas/Create" class="btn btn-primary"><span class ="bi bi-plus-square mt-1"></span> Crear</a>
+		</div>
+
+		<div class="card-body"> @*labels*@
+			<div class="row">
+
+				@*Filtrar por*@
+				<div class="col-3">
+					<label class="col-form-label"><strong>Filtrar por</strong></label>
+				</div>
+
+				@*ValorFiltro*@
+				<div class="col-4">
+					<label class="col-form-label"><strong>B&uacute;squeda</strong></label>
+				</div>
+			</div>
+
+			@*Input y botones*@
+			<div class="row align-items-center">
+
+				@*filtro*@
+				<div class="col-3">
+					<InputSelect class="form-select" @bind-value="Filtro">
+						<option value="" selected disabled>Seleccione </option>
+						<option value="PartidaId">PartidaId</option>
+						<option value="EstadoPartida">EstadoPartida</option>
+					</InputSelect>
+				</div>
+
+				@*Busqueda*@
+				<div class="col-4">
+					<div class="input-group">
+						<input class="form-control" @bind="ValorFiltro" placeholder="Buscar"/>
+						<button type="button" class="btn btn-primary bi bi-search" @onclink="Buscar"></button>
+					</div> </div>
+
+				@*Restaurar*@
+				<div class="col-2">
+					<button type="button" class="btn btn-outline-primary bi bi-arrow-counterclockwise" @onclick="Restablecer"></button>
+				</div>
+
+				<table class="table table-hover">
+					<thead class ="table table-striped text-black">
+						<tr>
+							<th>PartidaId</th>
+							<th>Jugador1</th>
+							<th>Jugador2</th>
+							<th>EstadoPartida</th>
+							<th>Ganador</th>
+							<th>FechaInicio</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach(var partidas in ListaPartidas)
+						{
+							<tr>
+								<td>@partidas.PartidaId</td>
+								<td>@partidas.Jugador1.Nombre</td> 
+								<td>@partidas.Jugador2?.Nombre</td>
+								<td>@partidas.EstadoPartida</td>
+								<td>@partidas.Ganador?.Nombre</td>
+								<td>@partidas.FechaInicio.ToShortDateString()</td>
+
+								<td class="text-center">
+									<a href="/Partidas/Edit/@partidas.PartidaId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div> <div class="card-footer space-between align-items-center">
+				<label>Cantidad: @ListaPartidas.Count()</label>
+			</div>
+		</div>
+	</div>
+</div>		    
+
+@code {
+
+	public List<Partidas> ListaPartidas {get; set; } =new List<Partidas>();
+	public string Filtro{get; set;} = string.Empty;
+	public string ValorFiltro{get; set;} = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CargarLista();
+	}
+	private async Task CargarLista()
+	{
+		ListaPartidas = await partidaService.Listar(p => true);
+	}
+
+	private async Task Buscar()
+	{
+		if(string.IsNullOrWhiteSpace(ValorFiltro) || string.IsNullOrWhiteSpace(Filtro))
+		{
+			await CargarLista();
+			return;
+		}
+
+		switch(Filtro)
+		{
+			case "PartidaId":
+				if(int.TryParse(ValorFiltro, out var partidaId))
+				{
+					ListaPartidas = await partidaService.Listar(p => p.PartidaId == partidaId);
+				}
+				else
+				{
+					ListaPartidas = new List<Partidas>();
+				}
+				break;
+			case "EstadoPartida":
+				ListaPartidas = await partidaService.Listar(p => p.EstadoPartida.ToLower().Contains(ValorFiltro.ToLower()));
+				break;
+		}
+	}
+
+	private async Task Restablecer()
+	{
+		Filtro =string.Empty;
+		ValorFiltro = string.Empty;
+		await CargarLista();
+	}
+
+
+}

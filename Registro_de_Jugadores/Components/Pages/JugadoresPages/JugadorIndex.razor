@@ -34,8 +34,8 @@
                 <div class="col-3">
                     <InputSelect class="form-select" @bind-value="Filtro">
                         <option value="" selected disabled>Seleccione </option>
-                        <option value="Nombre">Nombres</option>
-                        <option value="Partida">Partida</option>
+                        <option value="Nombre">Nombre</option>
+                        <option value="Partidas">Partidas</option>
                     </InputSelect>
                 </div>
 
@@ -57,8 +57,8 @@
                     <thead class="table table-striped text-black">
                         <tr>
                             <th>JugadorId</th>
-                            <th>Nombres</th>
-                            <th>Partida</th>
+                            <th>Nombre</th>
+                            <th>Partidas</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,9 +80,9 @@
 
              </div>
 
-             <div class="card-footer space-between">
-                 <label>Cantidad: @ListaJugadores.Count()</label>
-             </div>
+                 <div class="card-footer space-between">
+                     <label>Cantidad: @ListaJugadores.Count()</label>
+                 </div>
          </div>
     </div>
 </div>
