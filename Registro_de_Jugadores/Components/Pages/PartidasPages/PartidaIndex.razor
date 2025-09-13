@@ -34,7 +34,7 @@
 					<InputSelect class="form-select" @bind-value="Filtro">
 						<option value="" selected disabled>Seleccione </option>
 						<option value="PartidaId">PartidaId</option>
-						<option value="EstadoPartida">EstadoPartida</option>
+						<option value="EstadoPartida">Estado Partida</option>
 					</InputSelect>
 				</div>
 
@@ -42,7 +42,7 @@
 				<div class="col-4">
 					<div class="input-group">
 						<input class="form-control" @bind="ValorFiltro" placeholder="Buscar"/>
-						<button type="button" class="btn btn-primary bi bi-search" @onclink="Buscar"></button>
+						<button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
 					</div> </div>
 
 				@*Restaurar*@
@@ -103,18 +103,23 @@
 
 	private async Task Buscar()
 	{
-		if(string.IsNullOrWhiteSpace(ValorFiltro) || string.IsNullOrWhiteSpace(Filtro))
+		if (string.IsNullOrWhiteSpace(ValorFiltro) || string.IsNullOrWhiteSpace(Filtro))
 		{
 			await CargarLista();
 			return;
 		}
 
-		switch(Filtro)
+		switch (Filtro)
 		{
 			case "PartidaId":
-				if(int.TryParse(ValorFiltro, out var partidaId))
+				if (int.TryParse(ValorFiltro, out var partidaId))
 				{
-					ListaPartidas = await partidaService.Listar(p => p.PartidaId == partidaId);
+					var partidaEncontrada = await partidaService.Buscar(partidaId);
+					ListaPartidas = new List<Partidas>();
+					if (partidaEncontrada != null)
+					{
+						ListaPartidas.Add(partidaEncontrada);
+					}
 				}
 				else
 				{

@@ -47,8 +47,14 @@
             @*Estado de la partida*@
             <div class="mb-3">
                 <label class="col-form-label"><strong>Estado de la Partida</strong></label>
-                <InputText class="form-control" @bind-Value="partidas.EstadoPartida" />
-                <ValidationMessage For="() => partidas.EstadoPartida" />
+                <InputSelect @bind-Value="partidas.EstadoPartida" class="form-select">
+                    <option value="">Sleccione el Estado</option>
+                    @foreach (var estado in EstadoPartida)
+                    {
+                        <option value="@estado">@estado</option>
+                    }
+                </InputSelect>
+                
             </div>
 
             @*Estado del Tablero*@
@@ -73,7 +79,7 @@
         </div>
         <div class="card-footer text-center mt-2">
             <a href="/Partidas" class="btn btn-secondary"><span class="bi bi-arrow-left"></span> Volver</a>
-            <button type="submit" class="btn btn-primary bi bi-floppy"><span class="bi bi-save"></span> Guardar</button>
+            <button type="submit" class="btn btn-primary bi bi-floppy"><span class="bi bi-save>"></span>Guardar</button>
         </div>
     </div>
 </EditForm>
@@ -82,7 +88,14 @@
 
     private Partidas partidas = new Partidas();
     private List<Jugadores> jugadores = new List<Jugadores>();
-  
+    private List<string> EstadoPartida {get; set;} = new List<string>
+    {
+        "En Proceso",
+        "Finalizada",
+        "Empate",
+        "Abandonada"
+    };
+
     protected override async Task OnInitializedAsync()
     {
         jugadores = await jugadoresService.Listar(j => true);
