@@ -12,8 +12,8 @@ using Registro_de_Jugadores.DAL;
 namespace Registro_de_Jugadores.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20250913011323_Segunda")]
-    partial class Segunda
+    [Migration("20250916003629_BaseDeDato")]
+    partial class BaseDeDato
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,11 +33,17 @@ namespace Registro_de_Jugadores.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JugadorId"));
 
+                    b.Property<int>("Derrotas")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Empate")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Partidas")
+                    b.Property<int>("Victorias")
                         .HasColumnType("int");
 
                     b.HasKey("JugadorId");

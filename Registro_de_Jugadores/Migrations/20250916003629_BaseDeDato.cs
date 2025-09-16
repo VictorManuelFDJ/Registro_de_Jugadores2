@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Registro_de_Jugadores.Migrations
 {
     /// <inheritdoc />
-    public partial class Segunda : Migration
+    public partial class BaseDeDato : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +18,9 @@ namespace Registro_de_Jugadores.Migrations
                     JugadorId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Partidas = table.Column<int>(type: "int", nullable: false)
+                    Victorias = table.Column<int>(type: "int", nullable: false),
+                    Derrotas = table.Column<int>(type: "int", nullable: false),
+                    Empate = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

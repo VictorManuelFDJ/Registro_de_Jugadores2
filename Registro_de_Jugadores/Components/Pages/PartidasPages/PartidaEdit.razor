@@ -111,7 +111,7 @@
 		partidas = await partidaService.Buscar(PartidaId);
 		if(partidas == null)
 		{
-			navigationMannager.NavigateTo("/Partidas");
+			navigationMannager.NavigateTo("/Victorias");
 		}
 	}
 
@@ -120,7 +120,7 @@
 		var modificado = await partidaService.Guardar(partidas);
 		if(modificado)
 		{
-			navigationMannager.NavigateTo("/Partidas");
+			navigationMannager.NavigateTo("/Victorias");
 		}
 	}
 	
@@ -129,7 +129,7 @@
 		var eliminado = await partidaService.Eliminar(PartidaId);
 		if(eliminado)
 		{
-			navigationMannager.NavigateTo("/Partidas");
+			navigationMannager.NavigateTo("/Victorias");
 		}
 	}
 

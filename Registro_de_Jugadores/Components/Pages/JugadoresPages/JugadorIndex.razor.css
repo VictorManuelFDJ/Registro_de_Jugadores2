@@ -1,0 +1,12 @@
+﻿.card-header {
+    background-color: #f8f9fa; /* Un gris muy claro para el encabezado */
+}
+
+.table {
+    margin-top: 1rem;
+}
+
+.btn i {
+    vertical-align: middle;
+}
+
