@@ -7,7 +7,7 @@
 @rendermode InteractiveServer
 
 <PageTitle>Create</PageTitle>
-<EditForm Model="partidas" OnValidSubmit="Guardar">
+<EditForm Model="partidas" OnValidSubmit="Guardar" >
     <DataAnnotationsValidator />
     <ValidationSummary/> 
 
@@ -37,7 +37,7 @@
             <div class="mb-3">
                 <label class="col-form-label"><strong>Jugador2</strong></label>
                 <InputSelect @bind-Value="partidas.Jugador2Id" class="form-select">
-                    <option value="">Seleccione un Jugador</option>
+                    <option value="0">Seleccione un Jugador</option>
                     @foreach (var jugador in jugadores)
                     {
                         <option value="@jugador.JugadorId">@jugador.Nombre</option>
@@ -49,7 +49,7 @@
             <div class="mb-3">
                 <label class="col-form-label"><strong>Estado de la Partida</strong></label>
                 <InputSelect @bind-Value="partidas.EstadoPartida" class="form-select">
-                    <option value="">Sleccione el Estado</option>
+                    <option value="">Seleccione el Estado</option>
                     @foreach (var estado in EstadoPartida)
                     {
                         <option value="@estado">@estado</option>
@@ -81,13 +81,13 @@
         </div>
         <div class="card-footer text-center mt-2">
             <a href="/Partidas" class="btn btn-secondary"><span class="bi bi-arrow-left"></span> Volver</a>
-            <button type="submit" class="btn btn-primary bi bi-floppy"><span class="bi bi-save>"></span>Guardar</button>
+            <button type="submit" class="btn btn-primary bi bi-floppy"><span class="bi bi-save"></span>Guardar</button>
         </div>
     </div>
 </EditForm>
 
 @code {
-
+    
     private Partidas partidas = new Partidas();
     private List<Jugadores> jugadores = new List<Jugadores>();
     private List<string> EstadoPartida {get; set;} = new List<string>
