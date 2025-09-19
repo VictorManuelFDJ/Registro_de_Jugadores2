@@ -3,6 +3,7 @@
 @inject PartidasService partidaService
 @inject JugadoresServices jugadoresService
 @inject NavigationManager navigationMannager
+@inject SweetAlertService Swal
 @rendermode InteractiveServer
 
 <PageTitle>Create</PageTitle>
@@ -101,12 +102,19 @@
     {
         jugadores = await jugadoresService.Listar(j => true);
     }
+    
+   
+
     private async Task Guardar()
     {
         var creado = await partidaService.Guardar(partidas);
+       
         if (creado)
         {
-            navigationMannager.NavigateTo("/Victorias");
+           
+            navigationMannager.NavigateTo("/Partidas");
+        
         }
+       
     }
 }

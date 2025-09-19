@@ -1,7 +1,197 @@
 ﻿@page "/"
+@inject JugadoresServices jugadoresService
+@inject PartidasService partidaService
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
 
-<PageTitle>Registro de Jugadores</PageTitle>
+<PageTitle>TicTacToe</PageTitle>
 
-<h1>Bienvenido al registro de jugadores</h1>
+<div class="container mx-auto max-w-lg p-6 bg-white rounded-lg shadow-xl text-center">
+    <div class="game-container">
+        @if (!gameStarted)
+        {
+            <div class="selection-screen">
+                <h1>Elige tu jugador</h1>
+                @if (jugadores.Any())
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Jugador X</label>
+                        <InputSelect @bind-Value="jugador1Id" class="form-select" TValue="int?">
+                            <option value="">Seleccione...</option>
+                            @foreach (var jugador in jugadores)
+                            {
+                                <option value="@jugador.JugadorId">@jugador.Nombre</option>
+                            }
+                        </InputSelect>
+                    </div>
 
-Welcome to your new app.
+                    <div class="mb-3">
+                        <label class="form-label">Jugador O</label>
+                        <InputSelect @bind-Value="jugador2Id" class="form-select" TValue="int?">
+                            <option value="">Seleccione...</option>
+                            @foreach (var jugador in jugadores)
+                            {
+                                <option value="@jugador.JugadorId" disabled="@(jugador.JugadorId == jugador1Id)">
+                                    @jugador.Nombre
+                                </option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <button class="btn btn-success btn-lg mt-4"
+                            disabled="@(jugador1Id == null || jugador2Id == null)"
+                            @onclick="StartGame">
+                        Iniciar Partida
+                    </button>
+                }
+                else
+                {
+                    <p>No se encontraron jugadores. Por favor, verificar que existan jugadores registrados</p>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="game-screen">
+                <h2 class="game-status">@GameStatus</h2>
+                <div class="game-board">
+                    @for (var i = 0; i < 9; i++)
+                    {
+                        var cellIndex = i;
+                        <button class="cell @GetPlayerClass(board[cellIndex])"
+                                @onclick="() => HandleCellClick(cellIndex)"
+                                disabled="@(board[cellIndex] != null || winner != null || esEmpate)">
+                            @board[cellIndex]?.ToString()
+                        </button>
+                    }
+                </div>
+                <button class="btn btn-secondary mt-4" @onclick="RestartGame">
+                    Reiniciar Juego
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private enum PlayerType { X, O }
+
+    private bool gameStarted;
+    private PlayerType?[] board = new PlayerType?[9];
+    private PlayerType _currentPlayerType = PlayerType.X;
+    private PlayerType? winner;
+    private bool esEmpate;
+
+
+    private int? jugador1Id {get; set;}
+    private int? jugador2Id {get; set;}
+    private List<Jugadores> jugadores = new List<Jugadores>();
+   
+
+    private string nombreJugador1;
+    private string nombreJugador2;
+    private Dictionary<string, PlayerType> jugadorIdToPlayerType = new Dictionary<string, PlayerType>();
+    private Dictionary<PlayerType, string> playerTypeToNombre = new Dictionary<PlayerType, string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        jugadores = await jugadoresService.Listar(j => true);
+    }
+
+    private string GameStatus
+    {
+        get
+        {
+            if (winner != null)
+            {
+                var nombreGanador = winner == PlayerType.X ? nombreJugador1 : nombreJugador2;
+                return $"🏆 ¡Ganador: {nombreGanador}!";
+            }
+            return esEmpate
+                ? "🤝 ¡Es un empate!"
+                : $"Turno de: {(jugadorIdToPlayerType.FirstOrDefault(x => x.Value == _currentPlayerType).Value == PlayerType.X ? nombreJugador1 : nombreJugador2)}";
+        }
+    }
+
+    private void StartGame()
+    {
+      if (jugador1Id.HasValue && jugador2Id.HasValue)
+        {
+            nombreJugador1 = jugadores.FirstOrDefault(j => j.JugadorId == jugador1Id)?.Nombre ?? "Jugador1";
+            nombreJugador2 = jugadores.FirstOrDefault(j => j.JugadorId == jugador2Id)?.Nombre ?? "Jugador2";
+
+            jugadorIdToPlayerType[jugador1Id.Value.ToString()] = PlayerType.X;
+            jugadorIdToPlayerType[jugador2Id.Value.ToString()] = PlayerType.O;
+
+            playerTypeToNombre[PlayerType.X] = nombreJugador1;
+            playerTypeToNombre[PlayerType.O] = nombreJugador2;
+
+            _currentPlayerType = PlayerType.X;
+            gameStarted = true;
+        }
+    }
+
+    private void HandleCellClick(int index)
+    {
+        if (board[index] != null || winner != null || esEmpate)
+        {
+            return;
+        }
+        board[index] = _currentPlayerType;
+
+        winner = CheckForWinner();
+        if (winner != null)
+        {
+            return;
+        }
+        esEmpate = board.All(cell => cell != null);
+        if (esEmpate)
+        {
+            return;
+        }
+        _currentPlayerType = (_currentPlayerType == PlayerType.X) ? PlayerType.O : PlayerType.X;
+    }
+
+    private PlayerType? CheckForWinner()
+    {
+        var winningLines = new[]
+        {
+            new[] {0, 1, 2}, new[] {3, 4, 5}, new[] {6, 7, 8},
+            new[] {0, 3, 6}, new[] {1, 4, 7}, new[] {2, 5, 8},
+            new[] {0, 4, 8}, new[] {2, 4, 6}
+        };
+
+        foreach (var line in winningLines)
+        {
+            var (a, b, c) = (line[0], line[1], line[2]);
+            if (board[a].HasValue && board[a] == board[b] && board[a] == board[c])
+            {
+                return board[a];
+            }
+        }
+        return null;
+    }
+
+    private void RestartGame()
+    {
+        gameStarted = false;
+        jugador1Id = null;
+        jugador2Id = null;
+        board = new PlayerType?[9];
+        _currentPlayerType = PlayerType.X;
+        winner = null;
+        esEmpate = false;
+
+        Task.Run(async () =>
+        {
+            jugadores = await jugadoresService.Listar(j => true);
+            StateHasChanged();
+        });
+    }
+
+    private string GetPlayerClass(PlayerType? player)
+    {
+        if (!player.HasValue) return "";
+        return player == PlayerType.X ? "player-x" : "player-o";
+    }
+}
