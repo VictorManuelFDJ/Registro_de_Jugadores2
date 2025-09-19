@@ -162,6 +162,7 @@
             partidaActual.GanadorId = winner == PlayerType.X ? jugador1Id.Value : jugador2Id.Value;
             partidaActual.EstadoPartida = "Finalizada";
             partidaActual.EstadoTablero = string.Join("", board.Select(p => p?.ToString() ?? "-"));
+             partidaActual.FechaFin = DateTime.UtcNow;
             await partidaService.Guardar(partidaActual);
 
 
@@ -176,6 +177,7 @@
             partidaActual.GanadorId = null;
             partidaActual.EstadoPartida = "Empate";
             partidaActual.EstadoTablero = string.Join("", board.Select(p => p?.ToString() ?? "-"));
+             partidaActual.FechaFin = DateTime.UtcNow;
             await partidaService.Guardar(partidaActual);
 
             await  ActualiazarEstaditicasJugadores(null);

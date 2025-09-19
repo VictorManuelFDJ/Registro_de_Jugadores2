@@ -74,6 +74,7 @@
 								<td>@partidas.EstadoTablero</td>
 								<td>@partidas.Ganador?.Nombre</td>
 								<td>@partidas.FechaInicio.ToShortDateString()</td>
+								<td>@partidas.FechaFin?.ToShortDateString()</td>
 
 								<td class="text-center">
 									<a href="/Partidas/Edit/@partidas.PartidaId" class="btn btn-outline-primary bi bi-pencil-square"></a>

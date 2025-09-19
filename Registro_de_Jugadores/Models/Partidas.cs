@@ -23,7 +23,7 @@ public class Partidas
     public string EstadoTablero { get; set; } = "---------";
 
     public DateTime FechaInicio { get; set; } = DateTime.UtcNow;
-    public DateTime? FechaFin { get; set; }
+    public DateTime? FechaFin { get; set; } = DateTime.UtcNow;
 
     // Propiedades de navegación
     [ForeignKey(nameof(Jugador1Id))]
