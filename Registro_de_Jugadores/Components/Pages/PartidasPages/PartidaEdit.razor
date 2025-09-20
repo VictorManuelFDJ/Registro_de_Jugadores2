@@ -22,7 +22,7 @@
 			@*Jugador 1*@
 			<div class="mb-3">
 				<label class="col-form-label"><strong>Jugador1</strong></label>
-				<InputSelect @bind-Value="partidas.Jugador1Id" class ="form-select">
+				<InputSelect @bind-Value="partidas.Jugador1Id" class ="form-select"  disabled>
 					<option value="0"> Seleccione un Jugador</option>
 					@foreach(var jugador in jugadores)
 					{
@@ -37,7 +37,7 @@
 				<label class="col-form-label"><strong>Jugador2</strong></label>
 				<InputSelect @bind-Value="partidas.Jugador2Id" class="form-select">
 					<option value="">Seleccione un Jugador</option>
-					@foreach( var jugador in jugadores)
+					@foreach( var jugador in jugadores.Where(j => j.JugadorId != partidas.Jugador1Id))
 					{
 						<option value="@jugador.JugadorId">@jugador.Nombre</option>
 					}
@@ -47,14 +47,14 @@
 			@*Estado de la Partida*@
 			<div class="mb-3">
 				<label class="col-form-label"><strong>Estado de la Partida</strong></label>
-				<InputText class="form-control" @bind-Value="partidas.EstadoPartida" />
+				<InputText class="form-control" @bind-Value="partidas.EstadoPartida"  disabled />
 				<ValidationMessage For="(() => partidas.EstadoPartida)" />
 			</div>
 
 			@*Ganador*@
 			<div class="mb-3">
 				<label class="col-form-label"><strong>Ganador</strong></label>
-				<InputSelect @bind-Value="partidas.GanadorId" class="form-select">
+				<InputSelect @bind-Value="partidas.GanadorId" class="form-select"  disabled>
 					<option value="">Seleccione un Ganador</option>
 					@foreach(var jugador in jugadores)
 					{
@@ -66,7 +66,7 @@
 			@*Turno del Jugador*@
 			<div class="mb-3">
 				<label class="col-form-label"><strong>Turno del Jugador</strong></label>
-				<InputSelect @bind-Value="partidas.TurnoJugadorId" class="form-select">
+				<InputSelect @bind-Value="partidas.TurnoJugadorId" class="form-select"  disabled>
 					<option value="0">Seleccione el Turno</option>
 					@foreach(var jugador in jugadores)
 					{
@@ -79,14 +79,14 @@
 			@*Estado del tablero*@
 			<div class="mb-3">
 				<label class="col-form-label"><strong>Estado del Tablero</strong></label>
-				<InputText class="form-control" @bind-Value="partidas.EstadoTablero" />
+				<InputText class="form-control" @bind-Value="partidas.EstadoTablero"   disabled/>
 				<ValidationMessage For="(() => partidas.EstadoTablero)" />
 			</div>
 
 			@*Fechas de Fin*@
 			<div class="mb-3">
 				<label class="col-form-label"><strong>Fecha de fin</strong></label>
-				<InputDate class="form-control" @bind-Value="partidas.FechaFin" />
+				<InputDate class="form-control" @bind-Value="partidas.FechaFin"   disabled/>
 			</div>
 		</div>
 
@@ -94,6 +94,12 @@
 			<a href="/Partidas" class="btn btn-secondary"><span class="bi bi-arrow-left"></span>Volver</a>
 			<button type="submit" class="btn btn-primary bi bi-floppy"> Modificar</button>
 			<button type="button" class ="btn btn-danger bi bi-trash" @onclick="Eliminar"> Eliminar</button>
+
+			@*Boton de Reanudar*@
+			@if(partidas.EstadoPartida == "En Proceso")
+			{
+				<a href="@($"game/{PartidaId}")" class="btn btn-success"><span class="bi bi-play-fill"></span> Reanudar</a>
+			}
 		</div>
 	</div>
 

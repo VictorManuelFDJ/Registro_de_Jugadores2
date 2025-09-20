@@ -10,7 +10,7 @@ public class Partidas
     public int PartidaId { get; set; }
 
     public int Jugador1Id { get; set; }
-    public int? Jugador2Id { get; set; }
+    public int Jugador2Id { get; set; }
 
     [Required(ErrorMessage = "EL campo estado de la partida es obligatorio")]
     [StringLength(20)]

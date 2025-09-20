@@ -27,8 +27,20 @@
 
             @*Partida*@
             <div class="mb-3">
-                <label class="form-label"><strong>Partidas</strong></label>
-                <InputNumber class="form-control" @bind-Value="jugador.Victorias"></InputNumber>
+                <label class="form-label"><strong>Victorias</strong></label>
+                <InputNumber class="form-control" @bind-Value="jugador.Victorias" disabled></InputNumber>
+                <ValidationMessage For="(() => jugador.Victorias)" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Derrotas</strong></label>
+                <InputNumber class="form-control" @bind-Value="jugador.Derrotas" disabled></InputNumber>
+                <ValidationMessage For="(() => jugador.Victorias)" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Empate</strong></label>
+                <InputNumber class="form-control" @bind-Value="jugador.Empate" disabled></InputNumber>
                 <ValidationMessage For="(() => jugador.Victorias)" />
             </div>
         </div>
