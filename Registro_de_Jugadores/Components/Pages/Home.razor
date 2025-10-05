@@ -64,7 +64,20 @@
     {
         if (jugador1Id.HasValue && jugador2Id.HasValue)
         {
-            navigationManager.NavigateTo($"/game/{jugador1Id.Value}/{jugador2Id.Value}");
+            var partidaActual = new Partidas
+            {
+                Jugador1Id = jugador1Id.Value,
+                Jugador2Id = jugador2Id.Value,
+                EstadoPartida = "En Proceso",
+                EstadoTablero = "---------",
+                TurnoJugadorId = jugador1Id.Value,
+                FechaInicio = DateTime.UtcNow
+            };
+
+            await partidaService.Guardar(partidaActual);
+
+            
+            navigationManager.NavigateTo($"/game/{partidaActual.PartidaId}?jugadorId={jugador1Id.Value}");
         }
     }
 }

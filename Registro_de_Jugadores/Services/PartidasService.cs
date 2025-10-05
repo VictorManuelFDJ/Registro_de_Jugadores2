@@ -31,12 +31,12 @@ public class PartidasService(IDbContextFactory<Contexto> DbFactory)
         contexto.Update(partidas);
         return await contexto.SaveChangesAsync() > 0;
     }
-    public async Task<bool> Existe(int PartidaId) 
+    public async Task<bool> Existe(int partidaId)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Partidas.AsNoTracking()
-            .Where(p => p.PartidaId == PartidaId)
-            .ExecuteDeleteAsync() > 0;
+        return await contexto.Partidas
+            .AsNoTracking()
+            .AnyAsync(p => p.PartidaId == partidaId);
     }
     public async Task<bool> Eliminar(int PartidaId)
     {

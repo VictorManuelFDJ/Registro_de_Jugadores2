@@ -1,10 +1,12 @@
 using Blazored.Toast;
 using CurrieTechnologies.Razor.SweetAlert2;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Registro_de_Jugadores.Components;
 using Registro_de_Jugadores.DAL;
 using Registro_de_Jugadores.Models;
 using Registro_de_Jugadores.Services;
+using Registro_de_Jugadores.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,7 @@ builder.Services.AddDbContextFactory<Contexto>(options =>
 
 builder.Services.AddScoped<JugadoresServices>();
 builder.Services.AddScoped<PartidasService>();
+builder.Services.AddSignalR();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -36,7 +39,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+
+
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
+app.MapHub<GameHub>("/gamehub");
 
 app.Run();
