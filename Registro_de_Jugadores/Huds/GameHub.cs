@@ -18,7 +18,6 @@ namespace Registro_de_Jugadores.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-           
             return base.OnDisconnectedAsync(exception);
         }
 
@@ -70,7 +69,6 @@ namespace Registro_de_Jugadores.Hubs
             board[index] = playerChar;
             partida.EstadoTablero = new string(board);
 
-            
             int[][] lines = new[]
             {
                 new[]{0,1,2}, new[]{3,4,5}, new[]{6,7,8},
@@ -103,7 +101,6 @@ namespace Registro_de_Jugadores.Hubs
             }
             else
             {
-                
                 partida.TurnoJugadorId = (partida.TurnoJugadorId == partida.Jugador1Id) ? partida.Jugador2Id : partida.Jugador1Id;
                 partida.EstadoPartida = "En Proceso";
             }
@@ -119,3 +116,4 @@ namespace Registro_de_Jugadores.Hubs
         }
     }
 }
+

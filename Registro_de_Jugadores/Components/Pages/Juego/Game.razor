@@ -73,27 +73,31 @@
             .WithAutomaticReconnect()
             .Build();
 
-        hubConnection.On<string, int, string, int?>("ReceiveState", (estadoTablero, turnoId, estadoPartida, ganadorId) =>
-        {
-            
-            for (int i = 0; i < 9; i++)
-            {
-                var c = estadoTablero.Length > i ? estadoTablero[i] : '-';
-                if (c == 'X') board[i] = PlayerType.X;
-                else if (c == 'O') board[i] = PlayerType.O;
-                else board[i] = null;
-            }
+        hubConnection.On<string, int?, string, int?>("ReceiveState", (estadoTablero, turnoId, estadoPartida, ganadorId) =>
+         {
+             for (int i = 0; i < 9; i++)
+             {
+                 var c = estadoTablero.Length > i ? estadoTablero[i] : '-';
+                 if (c == 'X') board[i] = PlayerType.X;
+                 else if (c == 'O') board[i] = PlayerType.O;
+                 else board[i] = null;
+             }
 
-            partidaActual.EstadoTablero = estadoTablero;
-            partidaActual.TurnoJugadorId = turnoId;
-            partidaActual.EstadoPartida = estadoPartida;
-            partidaActual.GanadorId = ganadorId;
+             if (partidaActual == null)
+             {
+                 partidaActual = new Partidas();
+             }
 
-            winner = DetermineWinnerFromBoard();
-            esEmpate = board.All(b => b != null) && winner == null;
+             partidaActual.EstadoTablero = estadoTablero;
+             partidaActual.TurnoJugadorId = turnoId.HasValue ? turnoId.Value : 0;
+             partidaActual.EstadoPartida = estadoPartida;
+             partidaActual.GanadorId = ganadorId;
 
-            InvokeAsync(StateHasChanged);
-        });
+             winner = DetermineWinnerFromBoard();
+             esEmpate = board.All(b => b != null) && winner == null;
+
+             InvokeAsync(StateHasChanged);
+         });
 
         hubConnection.On<string>("Error", async (msg) =>
         {
