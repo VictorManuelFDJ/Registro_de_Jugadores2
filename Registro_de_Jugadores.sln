@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Registro_de_Jugadores", "Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToe.BlazorWasm", "TicTacToe.BlazorWasm\TicTacToe.BlazorWasm.csproj", "{93557AFC-CBFE-4D78-B8E4-13AD29DF2D10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToe.Shared", "TicTacToe.Shared\TicTacToe.Shared.csproj", "{290E0208-86F7-4DF0-A17E-BA825E2279C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{93557AFC-CBFE-4D78-B8E4-13AD29DF2D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93557AFC-CBFE-4D78-B8E4-13AD29DF2D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93557AFC-CBFE-4D78-B8E4-13AD29DF2D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{290E0208-86F7-4DF0-A17E-BA825E2279C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{290E0208-86F7-4DF0-A17E-BA825E2279C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{290E0208-86F7-4DF0-A17E-BA825E2279C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{290E0208-86F7-4DF0-A17E-BA825E2279C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
