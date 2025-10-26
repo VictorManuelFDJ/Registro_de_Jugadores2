@@ -1,6 +1,6 @@
 ﻿@page "/jugadores"
 
-@inject JugadoresServices jugadoresService
+@inject JugadoresApiServices jugadoresApiService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
@@ -58,9 +58,7 @@
                         <tr>
                             <th>JugadorId</th>
                             <th>Nombre</th>
-                            <th>Victorias</th>
-                            <th>Derrotas</th>
-                            <th>Empate</th>
+                            <th>Email</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,14 +91,27 @@
 
 @code {
 
-    public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
+    public List<JugadorResponse>? ListaJugadores ;
 
     public string Filtro { get; set; } = string.Empty;
     public string ValorFiltro { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
+        if (ListaJugadores == null) 
+        {
+            await LoadPartidas();
+        }
+    }
+
+
+    private async Task LoadPartidas()
+    {
+        var response = await jugadoresApiService.GetJugadoresAsync();
+        if (response is Resource<List<PartidaResponse>>.Success success)
+        {
+            ListaJugadores = success.Data;
+        }
     }
 
     private async Task Buscar()
