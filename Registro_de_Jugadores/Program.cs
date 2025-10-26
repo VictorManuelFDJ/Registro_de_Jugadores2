@@ -8,9 +8,9 @@ using Registro_de_Jugadores.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
+var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConStr")));*/
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConStr")));
 
 
 
@@ -22,8 +22,6 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddBlazoredToast();
 builder.Services.AddSweetAlert2();
-
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://gestionhuacalesapi.azurewebsites.net/") });
 
 var app = builder.Build();
 

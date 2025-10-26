@@ -7,15 +7,7 @@ using System.Threading.Tasks;
 namespace TicTacToe.Shared.DTOs;
 
 
-public record MovimientosRequest
-(
+public record MovimientoRequest(
     int PartidaId,
-
-    string Jugador,
-
-    int PosicionFila,
-
-    int PosicionColumna 
+    int JugadorId 
 );
-
-
