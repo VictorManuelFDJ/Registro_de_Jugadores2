@@ -6,18 +6,6 @@ namespace TicTacToe.BlazorWasm.Services;
 
 public class PartidasApiService(HttpClient httpClient) : IPartidasApiService
 {
-    public async Task<Resource<List<PartidaResponse>>> GetPartidasAsync()
-    {
-        try
-        {
-            var response = await httpClient.GetFromJsonAsync<List<PartidaResponse>>("api/Partidas");
-            return new Resource<List<PartidaResponse>>.Success(response ?? []);
-        }
-        catch (Exception ex)
-        {
-            return new Resource<List<PartidaResponse>>.Error(ex.Message);
-        }
-    }
     public async Task<Resource<PartidaResponse>> GetPartidaAsync(int partidaId)
     {
         try
@@ -30,6 +18,20 @@ public class PartidasApiService(HttpClient httpClient) : IPartidasApiService
             return new Resource<PartidaResponse>.Error(ex.Message);
         }
     }
+
+    public async Task<Resource<List<PartidaResponse>>> GetPartidasAsync()
+    {
+        try
+        {
+            var response = await httpClient.GetFromJsonAsync<List<PartidaResponse>>("api/Partidas");
+            return new Resource<List<PartidaResponse>>.Success(response ?? []);
+        }
+        catch (Exception ex)
+        {
+            return new Resource<List<PartidaResponse>>.Error(ex.Message);
+        }
+    }
+
     public async Task<Resource<PartidaResponse>> PostPartida(int jugador1, int jugador2)
     {
         var request = new PartidaRequest(jugador1, jugador2);
@@ -49,5 +51,4 @@ public class PartidasApiService(HttpClient httpClient) : IPartidasApiService
             return new Resource<PartidaResponse>.Error("Respuesta inválida del servidor.");
         }
     }
-
 }

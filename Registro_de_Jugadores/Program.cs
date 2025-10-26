@@ -14,7 +14,7 @@ builder.Services.AddDbContextFactory<Contexto>(options =>
 
 
 
-builder.Services.AddScoped<JugadoresApiServices>();
+builder.Services.AddScoped<JugadoresServices>();
 builder.Services.AddScoped<PartidasService>();
 
 // Add services to the container.
