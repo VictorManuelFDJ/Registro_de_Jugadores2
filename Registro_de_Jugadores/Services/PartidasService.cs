@@ -69,6 +69,47 @@ public class PartidasService(IDbContextFactory<Contexto> DbFactory)
             .ToListAsync();
     }
 
+    //Nuevos metodos
+    public async Task<List<Partidas>> ListarSalasAbiertas()
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Partidas
+            .Where(p => p.Jugador2Id == null && p.EstadoPartida == "Pendiente")
+            .Include(p => p.Jugador1)
+            .AsNoTracking()
+            .ToListAsync();
+    }
 
+    public async Task<List<Partidas>> ListarPartidasEnJuego()
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Partidas
+            .Where(p => p.Jugador2Id != null && p.EstadoPartida == "En Proceso")
+            .Include(p => p.Jugador1)
+            .Include(p => p.Jugador2)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<bool> UnirseAPartida(int partidaId, int jugador2Id)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        var partida = await contexto.Partidas.FindAsync(partidaId);
+        if (partida == null || partida.Jugador2Id != null || partida.Jugador1Id == jugador2Id)
+        {
+            return false; 
+        }
+
+        partida.Jugador2Id = jugador2Id;
+        partida.EstadoPartida = "En Proceso";
+        partida.FechaInicio = DateTime.UtcNow; 
+        partida.TurnoJugadorId = partida.Jugador1Id;
+
+        contexto.Partidas.Update(partida);
+        return await contexto.SaveChangesAsync() > 0;
+    }
 }
+
+
+
 
