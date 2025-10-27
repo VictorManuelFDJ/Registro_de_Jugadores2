@@ -33,9 +33,9 @@ public class JugadoresApiServices(HttpClient httpClient) : IJugadoreApiService
         }
     }
 
-    public async Task<Resource<JugadorResponse>> PostJugador(string nombre, string email)
+    public async Task<Resource<JugadorResponse>> PostJugador(string nombres, string email)
     {
-        var request = new JugadorRequest(nombre, email);
+        var request = new JugadorRequest(nombres, email);
         try
         {
             var response = await httpClient.PostAsJsonAsync("api/Jugadors", request);
@@ -52,6 +52,4 @@ public class JugadoresApiServices(HttpClient httpClient) : IJugadoreApiService
             return new Resource<JugadorResponse>.Error("Respuesta inválida del servidor.");
         }
     }
-
-
 }

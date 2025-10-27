@@ -1,0 +1,86 @@
+﻿@page "/"
+@inject IJugadoreApiService jugadoresService
+@inject IPartidasApiService partidaService
+@inject NavigationManager navigationManager
+
+
+<PageTitle>TicTacToe</PageTitle>
+
+<div class="container mx-auto max-w-lg p-6 bg-white rounded-lg shadow-xl text-center">
+    <div class="game-container">
+        <div class="selection-screen">
+            <h1>Elige tu jugador</h1>
+            @if (jugadores.Any())
+            {
+                <div class="mb-3">
+
+                    <label class="form-label">Jugador X</label>
+                    <InputSelect @bind-Value="jugador1Id" class="form-select" TValue="int?">
+                        <option value="">Seleccione...</option>
+                        @foreach (var jugador in jugadores)
+
+                        {
+                            <option value="@jugador.JugadorId">@jugador.Nombres</option>
+                        }
+                    </InputSelect>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">Jugador O</label>
+                    <InputSelect @bind-Value="jugador2Id" class="form-select" TValue="int?">
+                        <option value="">Seleccione...</option>
+
+                        @foreach (var jugador in jugadores)
+                        {
+                            <option value="@jugador.JugadorId" disabled="@(jugador.JugadorId == jugador1Id)">
+                                @jugador.Nombres
+
+                            </option>
+                        }
+                    </InputSelect>
+                </div>
+
+
+                <button class="btn btn-success btn-lg mt-4"
+                        disabled="@(jugador1Id == null ||
+                        jugador2Id == null)"
+                    @onclick="StartGame">
+                Iniciar Partida
+            </button>
+                        }
+            else
+            {
+
+                <p>No se encontraron jugadores. Por favor, verificar que existan jugadores registrados</p>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private int? jugador1Id { get; set; }
+    private int? jugador2Id { get; set; }
+    private List<JugadorResponse> jugadores = new List<JugadorResponse>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var resource = await jugadoresService.GetJugadoresAsync();
+        if (resource is Resource<List<JugadorResponse>>.Success success)
+        {
+            jugadores = success.Data;
+        }
+        else
+        {
+            jugadores = new List<JugadorResponse>();
+        }
+    }
+
+    private async Task StartGame()
+    {
+        if (jugador1Id.HasValue && jugador2Id.HasValue)
+        {
+            navigationManager.NavigateTo($"/game/{jugador1Id.Value}/{jugador2Id.Value}");
+        }
+    }
+}
