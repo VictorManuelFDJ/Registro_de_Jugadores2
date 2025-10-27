@@ -11,7 +11,7 @@ public class JugadoresApiServices(HttpClient httpClient) : IJugadoreApiService
     {
         try
         {
-            var response = await httpClient.GetFromJsonAsync<JugadorResponse>($"api/Jugadors/{JugadorId}");
+            var response = await httpClient.GetFromJsonAsync<JugadorResponse>($"api/Jugadores/{JugadorId}");
             return new Resource<JugadorResponse>.Success(response!);
         }
         catch (Exception ex)
@@ -24,7 +24,7 @@ public class JugadoresApiServices(HttpClient httpClient) : IJugadoreApiService
     {
         try
         {
-            var response = await httpClient.GetFromJsonAsync<List<JugadorResponse>>("api/Jugadors");
+            var response = await httpClient.GetFromJsonAsync<List<JugadorResponse>>("api/Jugadores");
             return new Resource<List<JugadorResponse>>.Success(response ?? []);
         }
         catch (Exception ex)
@@ -38,7 +38,7 @@ public class JugadoresApiServices(HttpClient httpClient) : IJugadoreApiService
         var request = new JugadorRequest(nombres, email);
         try
         {
-            var response = await httpClient.PostAsJsonAsync("api/Jugadors", request);
+            var response = await httpClient.PostAsJsonAsync("api/Jugadores", request);
             response.EnsureSuccessStatusCode();
             var created = await response.Content.ReadFromJsonAsync<JugadorResponse>();
             return new Resource<JugadorResponse>.Success(created!);
