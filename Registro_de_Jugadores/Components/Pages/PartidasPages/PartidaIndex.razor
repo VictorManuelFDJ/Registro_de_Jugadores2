@@ -1,6 +1,6 @@
 ﻿@page "/Partidas"
 
-@inject PartidasService partidaService
+@inject  IPartidaApiService partidaApiService
 @inject NavigationManager navigationMannager
 @rendermode InteractiveServer
 
@@ -56,11 +56,7 @@
 							<th>PartidaId</th>
 							<th>Jugador1</th>
 							<th>Jugador2</th>
-							<th>EstadoPartida</th> 
-							<th>EstadoTablero</th>
-							<th>Ganador</th>
-							<th>FechaInicio</th>
-							<th>FechaFin</th>
+					
 						</tr>
 					</thead>
 					<tbody>
@@ -68,14 +64,8 @@
 						{
 							<tr>
 								<td>@partidas.PartidaId</td>
-								<td>@partidas.Jugador1.Nombre</td> 
-								<td>@partidas.Jugador2?.Nombre</td>
-								<td>@partidas.EstadoPartida</td>
-								<td>@partidas.EstadoTablero</td>
-								<td>@partidas.Ganador?.Nombre</td>
-								<td>@partidas.FechaInicio.ToShortDateString()</td>
-								<td>@partidas.FechaFin?.ToShortDateString()</td>
-
+								<td>@partidas.Jugador1Id</td> 
+								<td>@partidas.Jugador2Id</td>
 								<td class="text-center">
 									<a href="/Partidas/Edit/@partidas.PartidaId" class="btn btn-outline-primary bi bi-pencil-square"></a>
 								</td>
@@ -92,55 +82,51 @@
 
 @code {
 
-	public List<Partidas> ListaPartidas {get; set; } =new List<Partidas>();
+	public List<PartidaResponse> ListaPartidas { get; set; } = new List<PartidaResponse>();
 	public string Filtro{get; set;} = string.Empty;
 	public string ValorFiltro{get; set;} = string.Empty;
 
 	protected override async Task OnInitializedAsync()
 	{
-		await CargarLista();
+		await LoadPartidas();
 	}
-	private async Task CargarLista()
+
+	public async Task LoadPartidas()
 	{
-		ListaPartidas = await partidaService.Listar(p => true);
+		var Response = await partidaApiService.GetPartidasAsync();
+
+		if (Response is Resource<List<PartidaResponse>>.Success succes)
+		{
+			ListaPartidas = succes.Data;
+		}
+		else if (Response is Resource<List<PartidaResponse>>.Error error)
+		{
+			Console.WriteLine("Hay un error");
+		}
+
 	}
 
 	private async Task Buscar()
 	{
-		if (string.IsNullOrWhiteSpace(ValorFiltro) || string.IsNullOrWhiteSpace(Filtro))
+		if (ValorFiltro.Trim() != "")
 		{
-			await CargarLista();
-			return;
+			if (Filtro == nameof(PartidaResponse.PartidaId) && int.TryParse(ValorFiltro, out var PartidaId))
+			{
+				ListaPartidas = ListaPartidas.Where(p => p.PartidaId == PartidaId).ToList();
+			}
+			
 		}
-
-		switch (Filtro)
+		else
 		{
-			case "PartidaId":
-				if (int.TryParse(ValorFiltro, out var partidaId))
-				{
-					var partidaEncontrada = await partidaService.Buscar(partidaId);
-					ListaPartidas = new List<Partidas>();
-					if (partidaEncontrada != null)
-					{
-						ListaPartidas.Add(partidaEncontrada);
-					}
-				}
-				else
-				{
-					ListaPartidas = new List<Partidas>();
-				}
-				break;
-			case "EstadoPartida":
-				ListaPartidas = await partidaService.Listar(p => p.EstadoPartida.ToLower().Contains(ValorFiltro.ToLower()));
-				break;
+			await LoadPartidas();
 		}
 	}
 
 	private async Task Restablecer()
 	{
-		Filtro =string.Empty;
+		await LoadPartidas();
+		Filtro = string.Empty;
 		ValorFiltro = string.Empty;
-		await CargarLista();
 	}
 
 
