@@ -1,13 +1,10 @@
 ﻿@page "/jugadores/Create"
 
-@inject JugadoresServices jugadoresService
-@inject NavigationManager navigationManager
+@inject IJugadoresApiService jugadoresApiService
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Create</PageTitle>
-<EditForm Model="jugador" OnValidSubmit="Guardar" FormName="Jugadores">
-    <DataAnnotationsValidator />
-
     <div class="container">
         <div class="card shadow-lg">
             <div class=" card-header text-center">
@@ -17,72 +14,39 @@
 
         <div class="card-body">
 
-            @*Nombre*@
+            
             <div class="mb-3">
                 <label class="col-form-label"><strong>Nombres</strong></label>
-                <InputText class="form-control" @bind-Value="jugador.Nombre"></InputText>
-                <label class="form-label"><strong>@Mensaje</strong></label>
-                <ValidationMessage For="(() => jugador.Nombre)" />
+                <InputText class="form-control" @bind-Value="Nombre"></InputText>
             </div>
 
-            @*Partida*@
+            
             <div class="mb-3">
-                <label class="form-label"><strong>Victorias</strong></label>
-                <InputNumber class="form-control" @bind-Value="jugador.Victorias" disabled></InputNumber>
-                <ValidationMessage For="(() => jugador.Victorias)" />
+                <label class="form-label"><strong>Email</strong></label>
+                <InputText class="form-control" @bind-Value="Email"></InputText>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label"><strong>Derrotas</strong></label>
-                <InputNumber class="form-control" @bind-Value="jugador.Derrotas" disabled></InputNumber>
-                <ValidationMessage For="(() => jugador.Victorias)" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label"><strong>Empate</strong></label>
-                <InputNumber class="form-control" @bind-Value="jugador.Empate" disabled></InputNumber>
-                <ValidationMessage For="(() => jugador.Victorias)" />
-            </div>
+        
         </div>
 
-        @*footer*@
-        <div class="card-footer text-center mt-2">
-            <a href="/jugadores" class="btn btn-secondary"><span class="bi bi-arrow-left"></span>Volver</a>
-            <button type="submit" class="btn btn-primary bi bi-floppy"><span class="bi bi-save>"></span>Guardar</button>
-        </div>
+         <div class="card-footer text-center mt-2">
+             <a href="/jugadores/index" class="btn btn-secondary"><span class="bi bi-arrow-left"></span>Volver</a>
+             <button type="button" class="btn btn-primary bi bi-floppy" @onclick="Guardar"><span class="bi bi-save>"></span>Guardar</button>
 
-
+         </div>
     </div>
 
-</EditForm>
 
 
 @code {
-    public Jugadores jugador { get; set; } = new Jugadores();
-    public string Mensaje { get; set; } = string.Empty;
-    public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
+    public string Nombre { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
-    {
-        ListaJugadores = await jugadoresService.Listar(j => j.JugadorId > 0);
-    }
 
     public async Task Guardar()
     {
-        var existe = await jugadoresService.Existe(jugador.Nombre);
 
-        if (existe)
-        {
-            Mensaje = "Ya existe un jugador con ese nombre";
-            return;
-        }
-
-        var creado = await jugadoresService.Guardar(jugador);
-
-        if(creado)
-        {
-            navigationManager.NavigateTo("/jugadores");
-        }
+        var ok = await jugadoresApiService.PostJugadores(Nombre, Email);
+        NavigationManager.NavigateTo("/jugadores");
 
     }
 }

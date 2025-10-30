@@ -12,7 +12,15 @@ var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConStr")));
 
+builder.Services.AddHttpClient<IJugadoresApiService, JugadoresApiService>(client =>
+{
+    client.BaseAddress = new Uri("https://gestionhuacalesapi.azurewebsites.net/");
+});
 
+builder.Services.AddHttpClient<IPartidaApiService, PartidaApiService>(client =>
+{
+    client.BaseAddress = new Uri("https://gestionhuacalesapi.azurewebsites.net/");
+});
 
 builder.Services.AddScoped<JugadoresServices>();
 builder.Services.AddScoped<PartidasService>();
