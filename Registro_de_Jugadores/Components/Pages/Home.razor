@@ -1,6 +1,9 @@
 ﻿@page "/"
-@inject JugadoresServices jugadoresService
-@inject PartidasService partidaService
+
+@inject IJugadoresApiService jugadoresApiService
+@inject IPartidaApiService partidaApiService
+@inject IMovimientosApiService movimientosApiService
+
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
@@ -13,24 +16,24 @@
             @if (jugadores.Any())
             {
                 <div class="mb-3">
-                    <label class="form-label">Jugador X</label>
+                    <label class="form-label">Jugador 1 (X)</label>
                     <InputSelect @bind-Value="jugador1Id" class="form-select" TValue="int?">
                         <option value="">Seleccione...</option>
                         @foreach (var jugador in jugadores)
                         {
-                            <option value="@jugador.JugadorId">@jugador.Nombre</option>
+                            <option value="@jugador.JugadorId">@jugador.Nombres</option>
                         }
                     </InputSelect>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Jugador O</label>
+                    <label class="form-label">Jugador 2  (O)</label>
                     <InputSelect @bind-Value="jugador2Id" class="form-select" TValue="int?">
                         <option value="">Seleccione...</option>
                         @foreach (var jugador in jugadores)
                         {
                             <option value="@jugador.JugadorId" disabled="@(jugador.JugadorId == jugador1Id)">
-                                @jugador.Nombre
+                                @jugador.Nombres
                             </option>
                         }
                     </InputSelect>
@@ -53,18 +56,41 @@
 @code {
     private int? jugador1Id { get; set; }
     private int? jugador2Id { get; set; }
-    private List<Jugadores> jugadores = new List<Jugadores>();
+    private List<JugadorResponse> jugadores = new();
 
     protected override async Task OnInitializedAsync()
     {
-        jugadores = await jugadoresService.Listar(j => true);
-    }
+        var Response = await jugadoresApiService.GetJugadoresAsync();
+        if (Response is Resource<List<JugadorResponse>>.Success success)
+        {
+            jugadores = success.Data;
+        }
+        else
+        {
+            jugadores = new List<JugadorResponse>();
+        }
 
+    }
     private async Task StartGame()
     {
-        if (jugador1Id.HasValue && jugador2Id.HasValue)
+        if (!jugador1Id.HasValue)
+            return;
+        if (!jugador2Id.HasValue)
         {
-            navigationManager.NavigateTo($"/game/{jugador1Id.Value}/{jugador2Id.Value}");
+            navigationManager.NavigateTo($"/game/{jugador1Id.Value}");
+            return;
+        }
+
+       
+        var partida = await partidaApiService.PostPartida(jugador1Id.Value, jugador2Id ?? 0);
+
+        if (partida is Resource<PartidaResponse>.Success success)
+        {
+            navigationManager.NavigateTo($"/game/{success.Data.PartidaId}");
+        }
+        else
+        {
+            Console.WriteLine("Error al crear la partida.");
         }
     }
 }
