@@ -9,7 +9,7 @@ public class MovimientosApiService(HttpClient httpClient) : IMovimientosApiServi
     {
         try
         {
-            var response = await httpClient.GetFromJsonAsync<List<MovimientoResponse>>($"api/Movimientos{partidaId}");
+            var response = await httpClient.GetFromJsonAsync<List<MovimientoResponse>>($"api/Movimientos/{partidaId}");
             return new Resource<List<MovimientoResponse>>.Success(response ?? []);
         }
         catch (Exception ex)

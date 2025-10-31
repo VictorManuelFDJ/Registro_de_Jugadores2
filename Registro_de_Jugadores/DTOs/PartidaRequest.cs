@@ -8,5 +8,5 @@ namespace Registro_de_Jugadores.DTOs;
 
 public record PartidaRequest(
     int Jugador1Id,
-    int Jugador2Id
+    int? Jugador2Id
 );
